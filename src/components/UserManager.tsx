@@ -42,6 +42,7 @@ const UserManager = () => {
     role: "student" as "admin" | "student",
     organization_id: "",
     password: "",
+    prn: "",
     batch: "",
     division: "",
     department: "",
@@ -152,6 +153,7 @@ const UserManager = () => {
           organization_id: formData.organization_id,
           organization: selectedOrg?.name || '',
           password: formData.password,
+          prn: formData.prn,
           batch: formData.batch,
           division: formData.division,
           department: formData.department,
@@ -167,7 +169,7 @@ const UserManager = () => {
       });
 
       setIsDialogOpen(false);
-      setFormData({ name: "", email: "", role: "student", organization_id: "", password: "", batch: "", division: "", department: "", year: "", course: "" });
+      setFormData({ name: "", email: "", role: "student", organization_id: "", password: "", prn: "", batch: "", division: "", department: "", year: "", course: "" });
       fetchUsers();
     } catch (error) {
       console.error('Error creating user:', error);
@@ -206,7 +208,7 @@ const UserManager = () => {
   };
 
   const handleAddNew = () => {
-    setFormData({ name: "", email: "", role: "student", organization_id: "", password: "", batch: "", division: "", department: "", year: "", course: "" });
+    setFormData({ name: "", email: "", role: "student", organization_id: "", password: "", prn: "", batch: "", division: "", department: "", year: "", course: "" });
     setIsDialogOpen(true);
   };
 
@@ -221,11 +223,11 @@ const UserManager = () => {
       const headers = lines[0].split(',').map(h => h.trim());
       
       // Validate headers
-      const expectedHeaders = ['Full Name', 'Email', 'Password', 'Role', 'Organization', 'Batch', 'Division', 'Department', 'Year', 'Course'];
+      const expectedHeaders = ['Full Name', 'Email', 'Password', 'Role', 'Organization', 'PRN', 'Batch', 'Division', 'Department', 'Year', 'Course'];
       const isValidFormat = expectedHeaders.every(header => headers.includes(header));
       
       if (!isValidFormat) {
-        throw new Error('CSV must have columns: Full Name, Email, Password, Role, Organization, Batch, Division, Department, Year, Course');
+        throw new Error('CSV must have columns: Full Name, Email, Password, Role, Organization, PRN, Batch, Division, Department, Year, Course');
       }
 
       const users = [];
@@ -250,6 +252,7 @@ const UserManager = () => {
             role: userRow['Role'].toLowerCase(),
             organization_id: org.id,
             organization: org.name,
+            prn: userRow['PRN'] || '',
             batch: userRow['Batch'] || '',
             division: userRow['Division'] || '',
             department: userRow['Department'] || '',
@@ -344,6 +347,15 @@ const UserManager = () => {
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     placeholder="Enter password"
                     required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="prn">PRN</Label>
+                  <Input
+                    id="prn"
+                    value={formData.prn}
+                    onChange={(e) => setFormData({ ...formData, prn: e.target.value })}
+                    placeholder="Enter PRN"
                   />
                 </div>
                 <div className="space-y-2">
@@ -444,7 +456,7 @@ const UserManager = () => {
                       </Button>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      CSV format: Full Name, Email, Password, Role, Organization, Batch, Division, Department, Year, Course
+                      CSV format: Full Name, Email, Password, Role, Organization, PRN, Batch, Division, Department, Year, Course
                     </p>
                   </div>
                 </div>
