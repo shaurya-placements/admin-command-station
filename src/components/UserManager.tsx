@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Plus, Trash2, Users, Shield, GraduationCap, Filter, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -306,153 +307,155 @@ const UserManager = () => {
               <span>Add User</span>
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-2xl max-h-[90vh]">
             <DialogHeader>
               <DialogTitle>Add New User</DialogTitle>
               <DialogDescription>Create a new user account</DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Enter full name"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="Enter email address"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder="Enter password"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="role">Role</Label>
-                <Select value={formData.role} onValueChange={(value: "admin" | "student") => setFormData({ ...formData, role: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="student">Student</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="organization">Organization</Label>
-                <Select value={formData.organization_id} onValueChange={(value) => setFormData({ ...formData, organization_id: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select organization" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {organizations.map((org) => (
-                      <SelectItem key={org.id} value={org.id}>{org.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+            <ScrollArea className="h-[70vh] pr-4">
+              <form id="user-form" onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="batch">Batch</Label>
+                  <Label htmlFor="name">Full Name</Label>
                   <Input
-                    id="batch"
-                    value={formData.batch}
-                    onChange={(e) => setFormData({ ...formData, batch: e.target.value })}
-                    placeholder="Enter batch"
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="Enter full name"
+                    required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="division">Division</Label>
+                  <Label htmlFor="email">Email</Label>
                   <Input
-                    id="division"
-                    value={formData.division}
-                    onChange={(e) => setFormData({ ...formData, division: e.target.value })}
-                    placeholder="Enter division"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="department">Department</Label>
-                  <Input
-                    id="department"
-                    value={formData.department}
-                    onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                    placeholder="Enter department"
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="Enter email address"
+                    required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="year">Year</Label>
+                  <Label htmlFor="password">Password</Label>
                   <Input
-                    id="year"
-                    value={formData.year}
-                    onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                    placeholder="Enter year"
+                    id="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    placeholder="Enter password"
+                    required
                   />
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="course">Course</Label>
-                <Input
-                  id="course"
-                  value={formData.course}
-                  onChange={(e) => setFormData({ ...formData, course: e.target.value })}
-                  placeholder="Enter course"
-                />
-              </div>
-              <div className="space-y-4">
-                <div className="border-t pt-4">
-                  <Label>Bulk Upload</Label>
-                  <div className="flex items-center space-x-2 mt-2">
+                <div className="space-y-2">
+                  <Label htmlFor="role">Role</Label>
+                  <Select value={formData.role} onValueChange={(value: "admin" | "student") => setFormData({ ...formData, role: value })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="student">Student</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="organization">Organization</Label>
+                  <Select value={formData.organization_id} onValueChange={(value) => setFormData({ ...formData, organization_id: value })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select organization" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {organizations.map((org) => (
+                        <SelectItem key={org.id} value={org.id}>{org.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="batch">Batch</Label>
                     <Input
-                      type="file"
-                      accept=".csv"
-                      onChange={handleCSVUpload}
-                      disabled={isUploading}
-                      className="hidden"
-                      id="csv-upload"
+                      id="batch"
+                      value={formData.batch}
+                      onChange={(e) => setFormData({ ...formData, batch: e.target.value })}
+                      placeholder="Enter batch"
                     />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => document.getElementById('csv-upload')?.click()}
-                      disabled={isUploading}
-                      className="w-full"
-                    >
-                      <Upload className="w-4 h-4 mr-2" />
-                      {isUploading ? 'Uploading...' : 'Upload CSV'}
-                    </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    CSV format: Full Name, Email, Password, Role, Organization, Batch, Division, Department, Year, Course
-                  </p>
+                  <div className="space-y-2">
+                    <Label htmlFor="division">Division</Label>
+                    <Input
+                      id="division"
+                      value={formData.division}
+                      onChange={(e) => setFormData({ ...formData, division: e.target.value })}
+                      placeholder="Enter division"
+                    />
+                  </div>
                 </div>
-                <div className="flex justify-end space-x-2">
-                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button type="submit">Create</Button>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="department">Department</Label>
+                    <Input
+                      id="department"
+                      value={formData.department}
+                      onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                      placeholder="Enter department"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="year">Year</Label>
+                    <Input
+                      id="year"
+                      value={formData.year}
+                      onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                      placeholder="Enter year"
+                    />
+                  </div>
                 </div>
-              </div>
-            </form>
+                <div className="space-y-2">
+                  <Label htmlFor="course">Course</Label>
+                  <Input
+                    id="course"
+                    value={formData.course}
+                    onChange={(e) => setFormData({ ...formData, course: e.target.value })}
+                    placeholder="Enter course"
+                  />
+                </div>
+                <div className="space-y-4">
+                  <div className="border-t pt-4">
+                    <Label>Bulk Upload</Label>
+                    <div className="flex items-center space-x-2 mt-2">
+                      <Input
+                        type="file"
+                        accept=".csv"
+                        onChange={handleCSVUpload}
+                        disabled={isUploading}
+                        className="hidden"
+                        id="csv-upload"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => document.getElementById('csv-upload')?.click()}
+                        disabled={isUploading}
+                        className="w-full"
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        {isUploading ? 'Uploading...' : 'Upload CSV'}
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      CSV format: Full Name, Email, Password, Role, Organization, Batch, Division, Department, Year, Course
+                    </p>
+                  </div>
+                </div>
+              </form>
+            </ScrollArea>
+            <div className="flex justify-end space-x-2 pt-4 border-t">
+              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" form="user-form">Create</Button>
+            </div>
           </DialogContent>
         </Dialog>
       </div>
