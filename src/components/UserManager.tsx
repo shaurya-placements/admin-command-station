@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, Users, Shield, GraduationCap, Filter } from "lucide-react";
+import { Plus, Trash2, Users, Shield, GraduationCap, Filter, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -42,6 +42,7 @@ const UserManager = () => {
     organization_id: "",
     password: ""
   });
+  const [isUploading, setIsUploading] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -198,6 +199,76 @@ const UserManager = () => {
     setIsDialogOpen(true);
   };
 
+  const handleCSVUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const text = await file.text();
+      const lines = text.split('\n').filter(line => line.trim());
+      const headers = lines[0].split(',').map(h => h.trim());
+      
+      // Validate headers
+      const expectedHeaders = ['Full Name', 'Email', 'Password', 'Role', 'Organization'];
+      const isValidFormat = expectedHeaders.every(header => headers.includes(header));
+      
+      if (!isValidFormat) {
+        throw new Error('CSV must have columns: Full Name, Email, Password, Role, Organization');
+      }
+
+      const users = [];
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim());
+        if (values.length === headers.length) {
+          const userRow: any = {};
+          headers.forEach((header, index) => {
+            userRow[header] = values[index];
+          });
+          
+          // Find organization ID by name
+          const org = organizations.find(o => o.name.toLowerCase() === userRow['Organization'].toLowerCase());
+          if (!org) {
+            throw new Error(`Organization "${userRow['Organization']}" not found for user ${userRow['Full Name']}`);
+          }
+
+          users.push({
+            name: userRow['Full Name'],
+            email: userRow['Email'],
+            password: userRow['Password'],
+            role: userRow['Role'].toLowerCase(),
+            organization_id: org.id,
+            organization: org.name
+          });
+        }
+      }
+
+      // Insert all users
+      const { error } = await supabase
+        .from('auth')
+        .insert(users);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `${users.length} users created successfully.`,
+      });
+
+      fetchUsers();
+      event.target.value = ''; // Reset file input
+    } catch (error) {
+      console.error('Error uploading CSV:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to upload CSV.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -283,11 +354,39 @@ const UserManager = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex justify-end space-x-2">
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit">Create</Button>
+              <div className="space-y-4">
+                <div className="border-t pt-4">
+                  <Label>Bulk Upload</Label>
+                  <div className="flex items-center space-x-2 mt-2">
+                    <Input
+                      type="file"
+                      accept=".csv"
+                      onChange={handleCSVUpload}
+                      disabled={isUploading}
+                      className="hidden"
+                      id="csv-upload"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => document.getElementById('csv-upload')?.click()}
+                      disabled={isUploading}
+                      className="w-full"
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      {isUploading ? 'Uploading...' : 'Upload CSV'}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    CSV format: Full Name, Email, Password, Role, Organization
+                  </p>
+                </div>
+                <div className="flex justify-end space-x-2">
+                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button type="submit">Create</Button>
+                </div>
               </div>
             </form>
           </DialogContent>
