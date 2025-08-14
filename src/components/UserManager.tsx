@@ -40,7 +40,12 @@ const UserManager = () => {
     email: "",
     role: "student" as "admin" | "student",
     organization_id: "",
-    password: ""
+    password: "",
+    batch: "",
+    division: "",
+    department: "",
+    year: "",
+    course: ""
   });
   const [isUploading, setIsUploading] = useState(false);
 
@@ -145,7 +150,12 @@ const UserManager = () => {
           role: formData.role,
           organization_id: formData.organization_id,
           organization: selectedOrg?.name || '',
-          password: formData.password
+          password: formData.password,
+          batch: formData.batch,
+          division: formData.division,
+          department: formData.department,
+          year: formData.year,
+          course: formData.course
         }]);
 
       if (error) throw error;
@@ -156,7 +166,7 @@ const UserManager = () => {
       });
 
       setIsDialogOpen(false);
-      setFormData({ name: "", email: "", role: "student", organization_id: "", password: "" });
+      setFormData({ name: "", email: "", role: "student", organization_id: "", password: "", batch: "", division: "", department: "", year: "", course: "" });
       fetchUsers();
     } catch (error) {
       console.error('Error creating user:', error);
@@ -195,7 +205,7 @@ const UserManager = () => {
   };
 
   const handleAddNew = () => {
-    setFormData({ name: "", email: "", role: "student", organization_id: "", password: "" });
+    setFormData({ name: "", email: "", role: "student", organization_id: "", password: "", batch: "", division: "", department: "", year: "", course: "" });
     setIsDialogOpen(true);
   };
 
@@ -210,11 +220,11 @@ const UserManager = () => {
       const headers = lines[0].split(',').map(h => h.trim());
       
       // Validate headers
-      const expectedHeaders = ['Full Name', 'Email', 'Password', 'Role', 'Organization'];
+      const expectedHeaders = ['Full Name', 'Email', 'Password', 'Role', 'Organization', 'Batch', 'Division', 'Department', 'Year', 'Course'];
       const isValidFormat = expectedHeaders.every(header => headers.includes(header));
       
       if (!isValidFormat) {
-        throw new Error('CSV must have columns: Full Name, Email, Password, Role, Organization');
+        throw new Error('CSV must have columns: Full Name, Email, Password, Role, Organization, Batch, Division, Department, Year, Course');
       }
 
       const users = [];
@@ -238,7 +248,12 @@ const UserManager = () => {
             password: userRow['Password'],
             role: userRow['Role'].toLowerCase(),
             organization_id: org.id,
-            organization: org.name
+            organization: org.name,
+            batch: userRow['Batch'] || '',
+            division: userRow['Division'] || '',
+            department: userRow['Department'] || '',
+            year: userRow['Year'] || '',
+            course: userRow['Course'] || ''
           });
         }
       }
@@ -354,6 +369,55 @@ const UserManager = () => {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="batch">Batch</Label>
+                  <Input
+                    id="batch"
+                    value={formData.batch}
+                    onChange={(e) => setFormData({ ...formData, batch: e.target.value })}
+                    placeholder="Enter batch"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="division">Division</Label>
+                  <Input
+                    id="division"
+                    value={formData.division}
+                    onChange={(e) => setFormData({ ...formData, division: e.target.value })}
+                    placeholder="Enter division"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="department">Department</Label>
+                  <Input
+                    id="department"
+                    value={formData.department}
+                    onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                    placeholder="Enter department"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="year">Year</Label>
+                  <Input
+                    id="year"
+                    value={formData.year}
+                    onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                    placeholder="Enter year"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="course">Course</Label>
+                <Input
+                  id="course"
+                  value={formData.course}
+                  onChange={(e) => setFormData({ ...formData, course: e.target.value })}
+                  placeholder="Enter course"
+                />
+              </div>
               <div className="space-y-4">
                 <div className="border-t pt-4">
                   <Label>Bulk Upload</Label>
@@ -378,7 +442,7 @@ const UserManager = () => {
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    CSV format: Full Name, Email, Password, Role, Organization
+                    CSV format: Full Name, Email, Password, Role, Organization, Batch, Division, Department, Year, Course
                   </p>
                 </div>
                 <div className="flex justify-end space-x-2">
